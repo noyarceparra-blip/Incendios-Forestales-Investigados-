@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -93,29 +92,23 @@ if not df.empty:
         df_filtrado = df_filtrado[df_filtrado["Comuna"] == comuna_sel]
 
     # 6. GRÁFICO PRINCIPAL DE BARRAS: CANTIDAD DE VECES QUE SE REPETE CADA CAUSA
-    st.markdown('<div class="analytics-card">'
-                '<div class="card-label">📊 Frecuencia: Número de Incendios por Causa General</div>', unsafe_allow_html=True)
+    st.markdown('<div class="analytics-card"><div class="card-label">📊 Frecuencia: Número de Incendios por Causa General</div>', unsafe_allow_html=True)
     if "Causa General" in df_filtrado.columns and not df_filtrado.empty:
-        # Contamos cuántas veces se repite cada causa única (.value_counts())
         df_causas_frecuencia = df_filtrado["Causa General"].value_counts()
         st.bar_chart(df_causas_frecuencia, use_container_width=True)
     else:
         st.info("Sin datos para graficar causas.")
-    st.markdown('</div>', unsafe_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # 7. FILA INTERMEDIA: GRÁFICO CIRCULAR + TARJETAS MÉTRICAS
     col_izq_graf, col_der_met = st.columns([6, 4])
 
     with col_izq_graf:
-        # Gráfico Circular para Grupo de Causas (Misma posición del gráfico de torta de la referencia)
-        st.markdown('<div class="analytics-card" style="min-height: 380px;">'
-                    '<div class="card-label">🍕 Distribución por Grupo de Causas</div>', unsafe_allow_html=True)
+        st.markdown('<div class="analytics-card" style="min-height: 380px;"><div class="card-label">🍕 Distribución por Grupo de Causas</div>', unsafe_allow_html=True)
         if "Grupo de causas" in df_filtrado.columns and not df_filtrado.empty:
             df_grupo_counts = df_filtrado["Grupo de causas"].value_counts()
             
-            # Generamos el gráfico circular limpio usando matplotlib
             fig, ax = plt.subplots(figsize=(6, 4), facecolor='white')
-            # Colores suaves estilo dashboard moderno
             colores = ['#00bfa5', '#ff6d00', '#29b6f6', '#ab47bc', '#ffee58', '#9ccc65']
             
             ax.pie(
@@ -126,20 +119,19 @@ if not df.empty:
                 colors=colores[:len(df_grupo_counts)],
                 textprops={'fontsize': 9, 'color': '#202124'}
             )
-            ax.axis('equal')  # Asegura que sea un círculo perfecto
+            ax.axis('equal')
             st.pyplot(fig)
         else:
             st.info("Sin registros para generar el gráfico circular.")
-        st.markdown('</div>', unsafe_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_der_met:
-        # Tarjetas de Métricas Verticales en el bloque derecho
         total_focos = len(df_filtrado)
         st.markdown(f"""
             <div class="analytics-card">
                 <div class="card-label">Total Incendios Investigados</div>
                 <div class="card-value">{total_focos:,}</div>
-                <div class="card-subtext"><span class="text-green">★ Monitoreados</span> en tiempo real</div>
+                <div class="card-subtext"><span class="text-green">★ Monitoreados</span> en la temporada</div>
             </div>
             """, unsafe_allow_html=True)
             
@@ -153,8 +145,7 @@ if not df.empty:
             """, unsafe_allow_html=True)
 
     # 8. TABLA INFERIOR DETALLADA
-    st.markdown('<div class="analytics-card">'
-                '<div class="card-label">📋 Resumen de Registros Filtrados</div>', unsafe_allow_html=True)
+    st.markdown('<div class="analytics-card"><div class="card-label">📋 Resumen de Registros Filtrados</div>', unsafe_allow_html=True)
     columnas_deseadas = ["ID", "Temporada", "Comuna", "Nombre incendio", "Causa General", "Grupo de causas", "Sup"]
     columnas_visibles = [c for c in columnas_deseadas if c in df_filtrado.columns]
     st.dataframe(df_filtrado[columnas_visibles], use_container_width=True, hide_index=True)
