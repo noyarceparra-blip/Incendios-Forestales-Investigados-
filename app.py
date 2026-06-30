@@ -91,10 +91,13 @@ if not df.empty:
     if comuna_sel != "Todas":
         df_filtrado = df_filtrado[df_filtrado["Comuna"] == comuna_sel]
 
-    # 6. GRÁFICO PRINCIPAL DE BARRAS: CANTIDAD DE VECES QUE SE REPETE CADA CAUSA
-    st.markdown('<div class="analytics-card"><div class="card-label">📊 Frecuencia: Número de Incendios por Causa General</div>', unsafe_allow_html=True)
+    # 6. GRÁFICO PRINCIPAL DE BARRAS: ORDENADO DE MAYOR A MENOR
+    st.markdown('<div class="analytics-card"><div class="card-label">📊 Frecuencia: Número de Incendios por Causa General (Mayor a Menor)</div>', unsafe_allow_html=True)
     if "Causa General" in df_filtrado.columns and not df_filtrado.empty:
-        df_causas_frecuencia = df_filtrado["Causa General"].value_counts()
+        # Extraemos la frecuencia, asegurando el orden descendente estricto
+        df_causas_frecuencia = df_filtrado["Causa General"].value_counts().sort_values(ascending=False)
+        
+        # Graficamos usando el índice tal cual está ordenado
         st.bar_chart(df_causas_frecuencia, use_container_width=True)
     else:
         st.info("Sin datos para graficar causas.")
@@ -148,7 +151,10 @@ if not df.empty:
     st.markdown('<div class="analytics-card"><div class="card-label">📋 Resumen de Registros Filtrados</div>', unsafe_allow_html=True)
     columnas_deseadas = ["ID", "Temporada", "Comuna", "Nombre incendio", "Causa General", "Grupo de causas", "Sup"]
     columnas_visibles = [c for c in columnas_deseadas if c in df_filtrado.columns]
-    st.dataframe(df_filtrado[columnas_visibles], use_container_width=True, hide_index=True)
+    
+    # También ordenamos la tabla de mayor a menor según la superficie por consistencia visual
+    df_tabla_ordenada = df_filtrado[columnas_visibles].sort_values(by="Sup", ascending=False) if "Sup" in df_filtrado.columns else df_filtrado[columnas_visibles]
+    st.dataframe(df_tabla_ordenada, use_container_width=True, hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 else:
