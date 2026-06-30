@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from pyproj import Transformer
@@ -11,6 +10,7 @@ st.set_page_config(
 )
 
 # 2. ESTILOS CSS PARA IMITAR LA REFERENCIA DE GOOGLE ANALYTICS
+# Aquí corregimos el parámetro por unsafe_allow_html=True
 st.markdown("""
     <style>
     /* Fondo general gris claro */
@@ -63,10 +63,10 @@ st.markdown("""
     .text-green { color: #00bfa5; }
     .text-orange { color: #ff6d00; }
     </style>
-    """, unsafe_style_code=True)
+    """, unsafe_allow_html=True)
 
 # 3. BARRA DE TÍTULO PRINCIPAL
-st.markdown('<div class="header-bar"><h2 class="header-title">TRAFFIC OVERVIEW — INCENDIOS FORESTALES</h2></div>', unsafe_html=True)
+st.markdown('<div class="header-bar"><h2 class="header-title">TRAFFIC OVERVIEW — INCENDIOS FORESTALES</h2></div>', unsafe_allow_html=True)
 
 # 4. CARGA DE DATOS SEGURO (Mapeo UTM a Lat/Lon)
 @st.cache_data
@@ -110,17 +110,17 @@ if not df.empty:
     col_izq, col_der = st.columns([7, 3]) # Dividimos en 70% y 30% de ancho
 
     with col_izq:
-        # Bloque del Mapa Principal (Equivalente al gráfico central grande de la referencia)
+        # Bloque del Mapa Principal
         st.markdown('<div class="analytics-card" style="min-height: 480px;">'
-                    '<div class="card-label">📍 Mapa de Focos Investigados (Coordenadas Reales)</div>', unsafe_html=True)
+                    '<div class="card-label">📍 Mapa de Focos Investigados (Coordenadas Reales)</div>', unsafe_allow_html=True)
         if 'latitude' in df_filtrado.columns and not df_filtrado.empty:
             st.map(df_filtrado, latitude='latitude', longitude='longitude', use_container_width=True)
         else:
             st.info("Sin datos geográficos para desplegar.")
-        st.markdown('</div>', unsafe_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_der:
-        # Bloque de Tarjetas de Métricas Verticales (Lado derecho de la pantalla)
+        # Bloque de Tarjetas de Métricas Verticales
         
         # Tarjeta 1: Total Focos
         total_focos = len(df_filtrado)
@@ -130,30 +130,30 @@ if not df.empty:
                 <div class="card-value">{total_focos:,}</div>
                 <div class="card-subtext"><span class="text-green">★ Monitoreados</span> en la temporada</div>
             </div>
-            """, unsafe_html=True)
+            """, unsafe_allow_html=True)
             
         # Tarjeta 2: Superficie Total
         total_sup = df_filtrado["Sup"].sum() if "Sup" in df_filtrado.columns else 0
         st.markdown(f"""
             <div class="analytics-card">
-                <div class="card-value" style="font-size:14px; color:#70757a; font-weight:bold; text-transform:uppercase; margin-bottom:10px;">Superficie Afectada</div>
+                <div class="card-label">Superficie Afectada</div>
                 <div class="card-value">{total_sup:,.1f} <span style="font-size:20px;">Ha</span></div>
                 <div class="card-subtext"><span class="text-orange">▲ Impacto</span> Rural/Forestal</div>
             </div>
-            """, unsafe_html=True)
+            """, unsafe_allow_html=True)
 
     # 7. FILA INFERIOR DE ANÁLISIS (Gráficos y Tablas secundarios)
     col_inf1, col_inf2 = st.columns([5, 5])
 
     with col_inf1:
         st.markdown('<div class="analytics-card" style="min-height: 380px;">'
-                    '<div class="card-label">📊 Hectáreas Afectadas por Causa General</div>', unsafe_html=True)
+                    '<div class="card-label">📊 Hectáreas Afectadas por Causa General</div>', unsafe_allow_html=True)
         if "Causa General" in df_filtrado.columns and "Sup" in df_filtrado.columns and not df_filtrado.empty:
             df_causas_sup = df_filtrado.groupby("Causa General")["Sup"].sum().sort_values(ascending=False)
             st.bar_chart(df_causas_sup, use_container_width=True)
         else:
             st.info("Sin datos para graficar.")
-        st.markdown('</div>', unsafe_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_inf2:
         st.markdown('<div class="analytics-card" style="min-height: 380px;">'
@@ -161,6 +161,6 @@ if not df.empty:
         columnas_deseadas = ["ID", "Temporada", "Comuna", "Nombre incendio", "Causa General", "Sup"]
         columnas_visibles = [c for c in columnas_deseadas if c in df_filtrado.columns]
         st.dataframe(df_filtrado[columnas_visibles], use_container_width=True, hide_index=True)
-        st.markdown('</div>', unsafe_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 else:
     st.warning("Verifica que el archivo se llame exactamente 'DATOS DUROS 2025-2026 WEB_2.xlsx' en tu repositorio.")
